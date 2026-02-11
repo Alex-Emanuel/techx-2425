@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title th:text="|#{title.Detail} ${event.name}|"></title>
+	<link rel="stylesheet" th:href="@{/css/style.css}" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<script src="https://kit.fontawesome.com/4426f07d91.js" crossorigin="anonymous"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+<body>	
+	<div class="page-wrapper eventdetail">
+		<div th:replace="~{fragments/nav :: nav(page='events')}"></div>
+		<div class="contentDetail">
+			<nav class="breadcrumb">
+				<a th:href="@{/events}" th:text="#{nav.events}"></a> &gt;
+				<span th:text="${event.name}"></span>
+			</nav>
+			<div class="eyecatcher">
+				<div>
+					<p th:with="df=#{date.format.pattern2}" th:text="${#temporals.format(event.date, df)}"></p>
+					<h2 th:text="${event.name}"></h2>
+					<p class="category" th:text="${event.category.displayNameWithEmoji}"></p>
+					<p th:text="|&euro; ${#numbers.formatDecimal(event.price, 1, 'POINT', 2, 'COMMA')}|"></p>
+					
+					<!-- BUTTONS -->
+					<form th:action="@{/favorites/favorite}"
+					      method="post"
+					      th:if="${user != null and user.role.displayRole == 'Gebruiker' and user.favoriteEvents.size() < maxFavoEvents and !user.favoriteEvents.contains(event)}">
+					    <input type="hidden" name="eventId" th:value="${event.id}" />
+					    <button>
+							<i class="fa-solid fa-heart-circle-plus"></i>
+							<span th:text="#{favorites.add}"></span>
+						</button>
+					</form>
+					
+					<form th:action="@{/favorites/favorite}"
+					      method="post"
+					      th:if="${user != null and user.role.displayRole == 'Gebruiker' and user.favoriteEvents.contains(event)}">
+					    <input type="hidden" name="eventId" th:value="${event.id}" />
+					    <button>
+							<i class="fa-solid fa-heart-circle-minus"></i>
+							<span th:text="#{favorites.remove}"></span>
+						</button>
+					</form>
+					
+					<a th:href="@{/saveevent(id=${event.id})}" class="nolink">
+						<button th:if="${user != null and user.role.displayRole == 'Administrator'}">
+							<i class="fa-solid fa-pen-to-square"></i>
+							<span th:text="#{eventdetail.edit}"></span>
+						</button>
+					</a>
+				</div>
+				<img th:src="@{/images/events/{id}(id=${event.id})}" th:alt="|Image of &quot;${event.name}&quot;|"/>
+			</div>
+		</div>
+		<div class="ticker">
+			<div class="ticker-content">
+				<span th:text="${event.category.displayNameWithoutEmoji}"></span>
+				<i class="fa-solid fa-minus"></i>
+				<span th:if="${event.announcement != null and !#strings.isEmpty(event.announcement)}">
+					<span th:text="${event.announcement}"></span>
+					<i class="fa-solid fa-minus"></i>
+				</span>
+				<span th:text="|#{results.speakerby} ${#strings.listJoin(event.speakers, ', ')}|"></span>
+			</div>
+		</div>
+		<div class="contentDetail">
+			<div class="basicInfo">
+				<div>
+					<h3 th:text="#{eventdetail.datetime}"></h3>
+					<p>
+						<i class="fa-regular fa-calendar"></i>
+						<span th:with="df=#{date.format.pattern2}" th:text="${#temporals.format(event.date, df)}"></span>
+					</p>
+					<p>
+						<i class="fa-regular fa-clock"></i>
+						<span th:with="tf=#{time.format.pattern}" th:text="${#temporals.format(event.time, tf)}"></span>
+					</p>
+				</div>
+				
+				<div>
+					<h3 th:text="#{eventdetail.location}"></h3>
+					<p>
+						<i class="fa-solid fa-location-dot"></i>
+						<span th:text="|Sint-Pietersplein 9, 9000 #{eventdetail.address}|"></span><br>
+					</p>
+					<p>
+						<i class="fa-solid fa-building"></i>
+						<span th:text="#{eventdetail.room}"></span>
+						<span th:text="${event.room}"></span>
+					</p>
+				</div>
+				
+				<div>
+					<h3 th:text="#{eventdetail.capacity}"></h3>
+					<p th:text="#{eventdetail.capacity.sentence(${event.room.capacity})}"></p>
+				</div>
+			</div>
+			<div class="descrDetail" th:if="${event.description != null}">
+				<h3 th:text="#{eventdetail.about}"></h3>
+				<p th:text="${event.description}"></p>
+			</div>
+			<div class="speakerDetail">
+			    <h3 th:text="#{eventdetail.speakers}"></h3>
+			    <div class="speakers">
+			        <div class="speakerBubble" th:each="speaker : ${event.speakers}">
+			            <p class="speakerName" th:text="|${speaker.firstname} ${speaker.lastname}|"></p>
+			            <p class="speakerOrg" th:text="${speaker.organization}"></p>
+			        </div>
+			    </div>
+			</div>
+			<div class="category-explorer fade-in">
+			    <h3 class="explore-title" th:text="#{explore.events}"></h3>
+			    <div class="category-chips">
+			        <a th:each="category : ${categories}" 
+			           th:href="@{/events(category=${category.name().toLowerCase()})}"
+			           class="category-chip animated-chip"
+			           th:text="${category.displayNameWithEmoji}">
+			        </a>
+			    </div>
+			</div>
+			<div class="category-explorer fade-in" th:if="${recommendedEvents.size() > 0}">
+			    <h3 class="explore-title" th:text="#{eventdetail.others}"></h3>
+			    <div class="events-wrapper">
+				    <div class="event-card" th:each="event : ${recommendedEvents}">
+				        <img th:src="@{/images/events/{id}(id=${event.id})}" th:alt="|Image of &quot;${event.name}&quot;|"/>
+				        <div class="tags">
+							<span class="price-tag" th:text="|&euro; ${#numbers.formatDecimal(event.price, 1, 'POINT', 2, 'COMMA')}|"></span>
+					    </div>
+				        <div class="card-content">
+				        	<p class="datetimeplace">
+					        	<i class="fa-regular fa-calendar"></i><span th:with="df=#{date.format.pattern2}" th:text="${#temporals.format(event.date, df)}"></span>
+					        	<i class="fa-regular fa-clock"></i><span th:with="tf=#{time.format.pattern}" th:text="${#temporals.format(event.time, tf)}"></span>
+					        	<i class="fa-solid fa-location-dot"></i><span th:text="${event.room}"></span>
+					        </p>
+					        <h3 th:text="${event.name}"></h3>
+					        <p class="speakers">
+					        	<span th:text="|#{results.speakerby} ${#strings.listJoin(event.speakers, ', ')}|"></span>
+					        </p>
+					        <p class="category" th:text="${event.category.displayNameWithEmoji}"></p>
+				        </div>
+				        <a class="link" th:href="@{/events/{id}(id=${event.id})}"></a>
+				    </div>
+				</div>
+			</div>
+		</div>
+		
+		<div th:replace="~{fragments/footer :: footer}"></div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nav</title>
+</head>
+<body>
+    <nav th:fragment="nav(page)">
+	    <div class="nav-links">
+	        <img class="logo" th:src="@{/img/techxlogo-white.png}" />
+	        <div class="language-switch">
+			    <form method="get" th:action="@{__${request}__}">
+			        <div class="select-wrapper">
+			            <i class="fa-solid fa-globe"></i>
+			            <select name="lang" onchange="this.form.submit()" class="language-select">
+			                <option value="nl" th:selected="${#locale.language == 'nl'}">NL</option>
+			                <option value="en" th:selected="${#locale.language == 'en'}">EN</option>
+			            </select>
+			            <input type="hidden" name="id" th:value="${event_id}" th:if="${event_id != null}" />
+			        </div>
+			    </form>
+			</div>
+	        <div>
+	            <a th:href="@{/events}"
+	               th:text="#{nav.events}"
+	               th:classappend="${page == 'events'} ? 'selected'"></a>
+	
+	            <a th:href="@{/rooms}" 
+	               th:if="${user != null and user.role.displayRole == 'Administrator'}"
+	               th:text="#{nav.rooms}"
+	               th:classappend="${page == 'rooms'} ? 'selected'"></a>
+	
+	            <a th:href="@{/favorites}"
+	               th:if="${user != null and user.role.displayRole == 'Gebruiker'}"
+	               th:text="#{nav.favs}"
+	               th:classappend="${page == 'favorites'} ? 'selected'"></a>
+	        </div>
+	    </div>   
+	    
+	    <div class="user-info" id="loginButton" onclick="toggleUserInfo()">
+	        <button class="login-btn" th:text="#{nav.login}"></button>
+	    </div>
+	
+	    <div class="user-info" style="display: none;" id="user-info" th:if="${user != null}">
+	        <div>
+	            <p class="user-name" th:text="${user.username}"></p>
+	            <p class="user-role" th:text="#{${user.role.displayRole}}"></p>
+	        </div>
+	        <i class="fa-solid fa-circle-user"></i>
+	        <div class="logout-popup">
+	            <button>
+	                <i class="fa-solid fa-arrow-right-from-bracket" style="font-size: 16px;"></i>
+	                <span th:text="#{nav.logout}"></span>
+	            </button>
+	        </div>
+	    </div>
+	</nav>
+</body>
+</html>

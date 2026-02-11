@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title th:text="#{title.Login}"></title>
+	<link rel="stylesheet" th:href="@{/css/style.css}" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<script src="https://kit.fontawesome.com/4426f07d91.js" crossorigin="anonymous"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+<body onload='document.loginForm.username.focus();'>
+	<div class="page-wrapper">
+		<div th:replace="~{fragments/nav :: nav(page='')}"></div>
+		
+		<div class="content-box centerbox">
+			<div class="login">
+			  <h3 th:text="#{nav.login}"></h3>
+			
+			  <div th:if="${error}" class="error" th:text="#{${error}}"></div>
+			  <div th:if="${msg}" class="msg" th:text="#{${msg}}"></div>
+			
+			  <form th:action="@{/login}" method="post" class="login-form">
+			    <div class="form-group">
+			      <label for="username" th:text="|#{login.user}|"></label>
+			      <input type="text" id="username" name="username" value="" />
+			    </div>
+			
+			    <div class="form-group">
+			      <label for="password" th:text="|#{login.password}|"></label>
+			      <input type="password" id="password" name="password" />
+			    </div>
+			
+			    <div class="form-group">
+			      <button type="submit" name="submit" class="allshow" id="allshowBtn" th:text="#{nav.login}"></button>
+			    </div>
+			
+			    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+			  </form>
+		  </div>
+		</div>
+
+		<div th:replace="~{fragments/footer :: footer}"></div>
+	</div>
+</body>
+</html>

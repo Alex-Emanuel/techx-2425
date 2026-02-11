@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title th:text="#{title.AddRoom}"></title>
+	<link rel="stylesheet" th:href="@{/css/style.css}" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<script src="https://kit.fontawesome.com/4426f07d91.js" crossorigin="anonymous"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+<body>	
+	<div class="page-wrapper eventdetail">
+		<div th:replace="~{fragments/nav :: nav(page='rooms')}"></div>
+		
+		<div class="contentDetail addEventForm">
+			<nav class="breadcrumb">
+				<a th:href="@{/rooms/list}" th:text="#{nav.rooms}"></a> &gt;
+				<span th:text="${room_id != 0 && room_id != null && room_id != -1} ? #{edit.room.title} : #{add.room.title}"></span>
+			</nav>
+			<div class="eyecatcher">
+				<div>
+					<h2 th:text="${room_id != 0 && room_id != null && room_id != -1} ? #{edit.room.title} : #{add.room.title}" class="addTitle"></h2>
+					<form th:action="@{/rooms/save}" th:object="${newroom}" method="post" enctype="multipart/form-data">
+
+					    <!-- Room Name -->
+					    <div class="form-group">
+					        <label for="roomcode"><span th:text="#{rooms.roomcode}"></span><span class="required">*</span></label>
+					        <input type="text" th:field="*{roomcode}" id="roomcode" th:placeholder="A123"/>
+					        <span th:if="${#fields.hasErrors('roomcode')}" th:errors="*{roomcode}" class="error"></span>
+					    </div>
+					    
+					    <!-- Capacity Field -->
+						<div class="form-group">
+						    <label for="capacity"><span th:text="#{rooms.capacity}"></span><span class="required">*</span></label>
+						    <input type="number" th:field="*{capacity}" id="capacity"/>
+						    <span th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}" class="error"></span>
+						</div>
+					
+					    <!-- Submit -->
+					    <div class="form-group">
+					    	<input type="hidden" name="room_id" th:value="${room_id}" />
+					        <button type="submit" class="submit-btn" 
+					        th:text="${room_id != 0 && room_id != null && room_id != -1} ? #{form.room.edit} : #{form.room.submit}"></button>
+					    </div>
+					</form>
+				</div>
+			</div>
+		</div>
+		
+		<div th:replace="~{fragments/footer :: footer}"></div>
+	</div>
+</body>
+</html>

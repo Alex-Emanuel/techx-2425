@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title th:text="#{title.Rooms}"></title>
+	<link rel="stylesheet" th:href="@{/css/style.css}" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<script src="https://kit.fontawesome.com/4426f07d91.js" crossorigin="anonymous"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+<body>	
+	<div class="page-wrapper">
+		<div th:replace="~{fragments/nav :: nav(page='rooms')}"></div>
+		<div class="content-box rooms-box">
+			<p th:if="${newCapacity}" 
+			   class="alert-message success-alert">
+			   <i class="fa-solid fa-circle-info"></i>
+			   <span th:text="#{room.saved.message(${newName}, ${newCapacity}, #{${action}})}">
+			   </span>
+			</p>
+			<div class="filters-container">
+				<h3 th:text="#{nav.rooms}"></h3>
+				<a th:href="@{/rooms/save}">
+					<button type="submit" class="filter-btn">
+						<i class="fa-solid fa-plus"></i>
+					</button>
+				</a>
+			</div>
+			<table class="rooms-table">
+				<thead>
+					<tr>
+						<th th:text="#{rooms.roomcode}"></th>
+						<th th:text="#{rooms.capacity}"></th>
+						<th th:text="#{rooms.actions}"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<th:block th:each="room, iter : ${rooms}">
+						<tr>
+					        <td th:text="${room.roomcode}"></td>
+					        <td th:text="${room.capacity}"></td>
+					        <td>
+					            <a th:href="@{/rooms/save(id=${room.id})}" class="nolink">
+					                <button><i class="fa-solid fa-pencil-alt"></i></button>
+					            </a>
+					        </td>
+					    </tr>
+					</th:block>
+				</tbody>
+			</table>
+		</div>
+		<div th:replace="~{fragments/footer :: footer}"></div>
+	</div>
+</body>
+</html>

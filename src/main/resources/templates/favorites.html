@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title th:text="#{title.Favorites}"></title>
+	<link rel="stylesheet" th:href="@{/css/style.css}" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<script src="https://kit.fontawesome.com/4426f07d91.js" crossorigin="anonymous"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+<body>	
+	<div class="page-wrapper">
+		<div th:replace="~{fragments/nav :: nav(page='favorites')}"></div>
+		<div class="content-box favorite-content">
+			<form th:action="@{/favorites}" method="get">
+			    <div class="filters">
+			        <h3 th:text="#{favorites.title}"></h3>
+			        <div class="filters-container">
+			            <select id="category" name="category" th:value="${selectedCategory}">
+			                <option value="" th:text="#{filters.category}"></option>
+			                <option th:each="category : ${categories}"
+			                        th:value="${category.name().toLowerCase()}"
+			                        th:text="${category.displayNameWithoutEmoji}"
+			                        th:selected="${category.name().toLowerCase() == selectedCategory}">
+			                </option>
+			            </select>
+			            <select id="date" name="date" th:value="${selectedDate}">
+			                <option value="" th:text="#{filters.date}"></option>
+			                <option th:each="date : ${dates}"
+			                        th:value="${date}"
+			                        th:selected="${date == selectedDate}"
+			                        th:with="df=#{date.format.pattern}"
+			                        th:text="${#temporals.format(date, df)}">
+			                </option>
+			            </select>
+			            <button type="submit" class="filter-btn" th:text="#{filters.filter}"></button>
+			        	<a href='/favorites' id="resetFiltersBtn" th:if="${selectedCategory != null or selectedDate != null}">
+				            <i class="fa-solid fa-filter-circle-xmark"></i>
+				        </a>
+			        </div>
+			    </div>
+			</form>
+			<div th:if="${user != null and user.role.displayRole == 'Gebruiker' and user.favoriteEvents.size() >= maxFavoEvents}" class="max-favs">
+			    <p><span class="bold" th:text="#{results.attention}"></span><span th:text="#{results.maxEvents}"></span></p>
+			</div>
+			<div th:if="${#lists.isEmpty(eventList)}" class="no-results">
+			    <p th:text="#{results.noFavs}"></p> 
+			    <a href="/events" class="allEventsBtn" th:text="#{results.allEvents}"></a>
+			</div>
+			
+			<div class="events-wrapper">
+			    <div class="event-card" th:each="event : ${eventList}">
+			    	<form th:action="@{/favorites/favorite}"
+					      method="post"
+					      th:if="${user != null and user.role.displayRole == 'Gebruiker' and (user.favoriteEvents.size() < maxFavoEvents or user.favoriteEvents.contains(event))}">
+					    <input type="hidden" name="eventId" th:value="${event.id}" />
+					    <button type="submit" class="favorite-icon">
+					        <i class="favorite-icon" th:classappend="${user.favoriteEvents.contains(event) ? 'fa-solid fa-heart' : 'fa-regular fa-heart'}"></i>
+					    </button>
+					</form>
+			        <img th:src="@{/images/events/{id}(id=${event.id})}" th:alt="|Image of &quot;${event.name}&quot;|"/>
+			        <div class="tags">
+						<span class="price-tag" th:text="|&euro; ${#numbers.formatDecimal(event.price, 1, 'POINT', 2, 'COMMA')}|"></span>
+				    </div>
+			        <div class="card-content">
+			        	<p class="datetimeplace">
+				        	<i class="fa-regular fa-calendar"></i><span th:with="df=#{date.format.pattern2}" th:text="${#temporals.format(event.date, df)}"></span>
+				        	<i class="fa-regular fa-clock"></i><span th:with="tf=#{time.format.pattern}" th:text="${#temporals.format(event.time, tf)}"></span>
+				        	<i class="fa-solid fa-location-dot"></i><span th:text="${event.room}"></span>
+				        </p>
+				        <h3 th:text="${event.name}"></h3>
+				        <p class="speakers">
+				        	<span th:text="|#{results.speakerby} ${#strings.listJoin(event.speakers, ', ')}|"></span>
+				        </p>
+				        <p class="category" th:text="${event.category.displayNameWithEmoji}"></p>
+			        </div>
+			        <a class="link" th:href="@{/events/{id}(id=${event.id})}"></a>
+			    </div>
+			</div>
+			
+			<div class="category-explorer fade-in">
+			    <h3 class="explore-title" th:text="#{explore.events}"></h3>
+			    <div class="category-chips">
+			        <a th:each="category : ${categories}" 
+			           th:href="@{/events(category=${category.name().toLowerCase()})}"
+			           class="category-chip animated-chip"
+			           th:text="${category.displayNameWithEmoji}">
+			        </a>
+			    </div>
+			</div>
+		</div>
+		<div th:replace="~{fragments/footer :: footer}"></div>
+	</div>
+</body>
+</html>

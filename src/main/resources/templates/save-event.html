@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title th:text="#{title.AddEvent}"></title>
+	<link rel="stylesheet" th:href="@{/css/style.css}" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<script src="https://kit.fontawesome.com/4426f07d91.js" crossorigin="anonymous"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+<body>	
+	<div class="page-wrapper eventdetail">
+		<div th:replace="~{fragments/nav :: nav(page='events')}"></div>
+		
+		<div class="contentDetail addEventForm">
+			<nav class="breadcrumb">
+				<a th:href="@{/events}" th:text="#{nav.events}"></a> &gt;
+				<span th:text="${event_id != 0 && event_id != null} ? #{edit.title} : #{add.title}"></span>
+			</nav>
+			<div class="eyecatcher">
+				<div>
+					<h2 th:text="${event_id != 0 && event_id != null} ? #{edit.title} : #{add.title}" class="addTitle"></h2>
+					<form th:action="@{/saveevent}" th:object="${newevent}" method="post" class="form-layout" enctype="multipart/form-data">
+
+					    <!-- Event Name -->
+					    <div class="form-group">
+					        <label for="name"><span th:text="#{form.event}"></span><span class="required">*</span></label>
+					        <input type="text" th:field="*{name}" id="name" th:placeholder="#{form.event.placeholder}"/>
+					        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error"></span>
+					    </div>
+					
+					    <!-- Description -->
+					    <div class="form-group">
+					        <label for="description" th:text="#{form.descr}"></label>
+					        <textarea th:field="*{description}" id="description" rows="4" th:placeholder="#{form.descr.placeholder}" placeholder="Short description..."></textarea>
+					        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></span>
+					    </div>
+					    			
+					    <!-- Announcement -->		    	
+						<div class="form-group">
+					        <label for="announcement" th:text="#{form.announcement}"></label>
+					        <textarea th:field="*{announcement}" id="announcement" rows="1" th:placeholder="#{form.announcement.placeholder}"></textarea>
+					        <span th:if="${#fields.hasErrors('announcement')}" th:errors="*{announcement}" class="error"></span>
+					    </div>
+					    
+					    <!-- Speakers -->
+					    <fieldset class="form-group speaker-group">
+					    	<h4 class="headerspeakers"><span th:text="#{form.speakers}"></span><span class="required">*</span></h4>
+							<div class="speakers-container" th:each="spreker, iStat : *{speakers}">
+								<div class="speaker-item">
+									<h4 th:text="|#{form.onespeaker} ${iStat.index + 1}|"></h4>
+								
+								    <input type="text" th:field="*{speakers[__${iStat.index}__].firstname}" th:placeholder="#{form.sp.fn.placeholder}"/>
+								    <input type="text" th:field="*{speakers[__${iStat.index}__].lastname}" th:placeholder="#{form.sp.ln.placeholder}"/>						             
+								    <input type="text" th:field="*{speakers[__${iStat.index}__].organization}" th:placeholder="#{form.sp.org.placeholder}"/>
+								</div>
+								
+								<span class="error insideerr"
+								      th:if="${#fields.hasErrors('speakers[' + iStat.index + '].firstname') 
+								           or #fields.hasErrors('speakers[' + iStat.index + '].lastname') 
+								           or #fields.hasErrors('speakers[' + iStat.index + '].organization')}">
+								
+								    <span th:if="${#fields.hasErrors('speakers[' + iStat.index + '].firstname')}"
+								          th:errors="*{speakers[__${iStat.index}__].firstname}"></span><br th:if="${#fields.hasErrors('speakers[' + iStat.index + '].firstname')}"/>
+								
+								    <span th:if="${#fields.hasErrors('speakers[' + iStat.index + '].lastname')}"
+								          th:errors="*{speakers[__${iStat.index}__].lastname}"></span><br th:if="${#fields.hasErrors('speakers[' + iStat.index + '].lastname')}"/>
+								
+								    <span th:if="${#fields.hasErrors('speakers[' + iStat.index + '].organization')}"
+								          th:errors="*{speakers[__${iStat.index}__].organization}"></span>
+								</span>
+								<!-- 
+								<span th:if="${#fields.hasErrors('speakers[' + iStat.index + '].organization')}" th:errors="*{speakers[__${iStat.index}__].organization}" class="error insideerr"></span>-->
+							</div>
+							
+					    	<span th:each="err : ${#fields.globalErrors()}" th:text="${err}" class="error outsideerr"></span>
+						</fieldset>
+						
+						<div class="form-row">
+						    <!-- Room -->
+						    <div class="form-group">
+						        <label for="room"><span th:text="#{form.room}"></span><span class="required">*</span></label>
+						        <select th:field="*{room}" id="room" >
+						            <option th:each="room : ${rooms}" th:value="${room}" th:text="${room}"></option>
+						        </select>
+						        <span th:if="${#fields.hasErrors('room')}" th:errors="*{room}" class="error"></span>
+						    </div>
+						
+						    <!-- Date & Time -->
+						    <div class="form-group">
+						        <label for="date"><span th:text="#{form.date}"></span><span class="required">*</span></label>
+						        <input type="date" th:field="*{date}" id="date"/>
+						        <span th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="error"></span>
+						    </div>
+						
+						    <div class="form-group">
+						        <label for="time"><span th:text="#{form.time}"></span><span class="required">*</span></label>
+						        <input type="time" th:field="*{time}" id="time"  />
+						        <span th:if="${#fields.hasErrors('time')}" th:errors="*{time}" class="error"></span>
+						    </div>
+					    </div>
+					
+						<div class="form-row">
+						    <!-- Beamer Code -->
+						    <div class="form-group">
+						        <label for="beamerCode"><span th:text="#{form.bcode}"></span><span class="required">*</span></label>
+						        <input type="text" th:field="*{beamerCode}" id="beamerCode"  th:placeholder="xxxx" />
+						        <span th:if="${#fields.hasErrors('beamerCode')}" th:errors="*{beamerCode}" class="error"></span>
+						    </div>
+						
+						    <div class="form-group">
+						        <label for="beamerCheck"><span th:text="#{form.bcheck}"></span><span class="required">*</span></label>
+						        <input type="number" th:field="*{beamerCheck}" id="beamerCheck" th:placeholder="xx" />
+						        <span th:if="${#fields.hasErrors('beamerCheck')}" th:errors="*{beamerCheck}" class="error"></span>
+						    </div>
+					    </div>
+					
+						<div class="form-row">
+						    <!-- Category -->
+						    <div class="form-group">
+						        <label for="category"><span th:text="#{form.cat}"></span><span class="required">*</span></label>
+						        <select th:field="*{category}" id="category" >
+						            <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.displayNameWithoutEmoji}"></option>
+						        </select>
+						        <span th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="error"></span>
+						    </div>
+						
+						    <!-- Price -->						    
+						    <div class="form-group">
+							    <label for="price"><span th:text="|#{form.price} (€)|"></span><span class="required">*</span></label>
+							    <input type="text" th:field="*{price}" id="price" placeholder="0.00" 
+							           oninput="this.value = this.value.replace(/[^0-9\.]/g, '').replace(/^(\d*\.\d{2}).*/, '$1')"/>
+							    <span th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="error"></span>
+							</div>
+					    </div>
+					    
+					    <!-- image -->
+					    <div class="form-group">
+						    <label for="image" th:text="#{form.image}"></label>
+						    <input type="file" id="image" name="image" accept=".jpg, .jpeg"/>
+						    <div th:if="${event_id != 0 and event_id != null and newevent.image != null}" class="uploadedimgdiv">
+						    	<img th:src="@{/images/events/{id}(id=${event_id})}" th:alt="|Image of &quot;${newevent.name}&quot;|"
+						    		class="uploadimg" />
+		                        <p class="uploadtxt" th:text="#{form.imgalready}"></p>
+		                    </div>							
+						</div>
+					
+					    <!-- Submit -->
+					    <div class="form-group">
+					        <button type="submit" class="submit-btn" th:text="${event_id != 0 && event_id != null} ? #{form.edit} : #{form.submit}"></button>
+					    </div>
+					    
+					</form>
+				</div>
+			</div>
+		</div>
+		
+		<div th:replace="~{fragments/footer :: footer}"></div>
+	</div>
+</body>
+</html>
