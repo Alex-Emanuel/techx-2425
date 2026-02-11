@@ -4,9 +4,9 @@ import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 
-import domain.User;
+import domain.MyUser;
 
-public interface UserRepository extends CrudRepository<User, Long>
+public interface UserRepository extends CrudRepository<MyUser, Long>
 {
-	Optional<User> findByUsername(String string);
+	Optional<MyUser> findByUsername(String string);
 }

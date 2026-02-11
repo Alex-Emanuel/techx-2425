@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,6 +32,7 @@ public class Speaker implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
+	// empty string OR any character multiple times (\\s spaces here still allowed)
 	@Pattern(regexp = "^$|^[A-Za-zÀ-ÿ\\s'-]+$", message = "{validation.firstname.Pattern.message}")
     private String firstname;
 	
@@ -61,5 +64,6 @@ public class Speaker implements Serializable {
     }
     
     @ManyToMany(mappedBy = "speakers")
+	@JsonIgnore
     private Set<Event> events = new HashSet<>();
 }

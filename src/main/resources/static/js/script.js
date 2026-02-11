@@ -1,10 +1,3 @@
-function toggleUserInfo() {
-    var loginButton = document.getElementById("loginButton");
-    var userInfo = document.getElementById("user-info");
-    loginButton.style.display = "none";
-    userInfo.style.display = "flex";
-}
-
 // QUOTES SLIDER
 // =============
 

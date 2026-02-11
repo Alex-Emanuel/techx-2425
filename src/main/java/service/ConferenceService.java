@@ -23,4 +23,7 @@ public interface ConferenceService {
 
 	@Transactional
 	public List<Event> getEventsByCategory(Category category, Long currentEventId);
+
+	@Transactional
+	public List<Event> getEventsByDate(LocalDate date);
 }

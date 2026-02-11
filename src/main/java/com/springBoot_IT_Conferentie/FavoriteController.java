@@ -3,6 +3,7 @@ package com.springBoot_IT_Conferentie;
 import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,8 +12,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import domain.Category;
-import domain.User;
-import jakarta.servlet.http.HttpServletRequest;
+import domain.MyUser;
 import repository.UserRepository;
 import service.ConferenceService;
 import service.UserService;
@@ -29,35 +29,32 @@ public class FavoriteController {
 	@Autowired
 	private UserRepository userRepository;
 	
-	private User user;
-	
 	@GetMapping("/favorites")
 	public String getEvents(@RequestParam(required = false) String category,
 	                         @RequestParam(required = false) LocalDate date,
-	                         HttpServletRequest request, Model model) {
+	                         Authentication authentication, Model model) {
 		
-		user = userRepository.findByUsername("user@example.com").get();
-	    model.addAttribute("user", user);
-		
+	    MyUser user = userRepository.findByUsername(authentication.getName()).get();
 	    model.addAttribute("eventList", userService.getFilteredFavoriteEvents(category, date, user));
 	    model.addAttribute("categories", Category.values());
 	    model.addAttribute("dates", conferenceService.getDateRange());
 
 	    model.addAttribute("selectedCategory", category);
 	    model.addAttribute("selectedDate", date);	    
-	    model.addAttribute("maxFavoEvents", User.MAX_EVENTS);
-	    
-	    String currentRequestURI = (request != null) ? request.getRequestURI() : "/error/404";
-        model.addAttribute("request", currentRequestURI);
+	    model.addAttribute("maxFavoEvents", MyUser.MAX_EVENTS);
 	    
 	    return "favorites";
 	}
 	
 	@PostMapping("/favorites/favorite")
-    public String toggleFavorite(@RequestParam Long eventId, @RequestHeader(required = false) String referer) {
-		userRepository.findByUsername("user@example.com").ifPresent(user -> {
-            userService.addRemoveFavoriteEvent(eventId, user);
-        });
-        return "redirect:" + (referer != null ? referer : "/events");
-    }
+	public String toggleFavorite(@RequestParam Long eventId, @RequestHeader(required = false) String referer,
+	                             Authentication authentication) {
+		
+	    String username = authentication.getName();
+	    userRepository.findByUsername(username).ifPresent(user -> {
+	        userService.addRemoveFavoriteEvent(eventId, user);
+	    });
+
+	    return "redirect:" + (referer != null ? referer : "/events");
+	}
 }

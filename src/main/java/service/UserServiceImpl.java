@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import domain.Event;
-import domain.User;
+import domain.MyUser;
 import repository.EventRepository;
 import repository.UserRepository;
 
+@Service
 public class UserServiceImpl implements UserService {
 
 	@Autowired
@@ -21,7 +23,7 @@ public class UserServiceImpl implements UserService {
 	private UserRepository userRepository;
 	
 	@Override
-	public void addRemoveFavoriteEvent(Long eventId, User user) {
+	public void addRemoveFavoriteEvent(Long eventId, MyUser user) {
 		Event event = eventRepository.findById(eventId).get();
 		
 		if (user.getFavoriteEvents().contains(event))
@@ -33,7 +35,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<Event> getFilteredFavoriteEvents(String category, LocalDate date, User user) {
+	public List<Event> getFilteredFavoriteEvents(String category, LocalDate date, MyUser user) {
 		List<Event> events = user.getFavoriteEvents().stream().collect(Collectors.toList());
 		
 	    // Filter on category

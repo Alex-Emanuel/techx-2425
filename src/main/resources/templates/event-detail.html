@@ -27,7 +27,7 @@
 					<!-- BUTTONS -->
 					<form th:action="@{/favorites/favorite}"
 					      method="post"
-					      th:if="${user != null and user.role.displayRole == 'Gebruiker' and user.favoriteEvents.size() < maxFavoEvents and !user.favoriteEvents.contains(event)}">
+					      th:if="${username != null and role == 'Gebruiker' and favoriteEvents.size() < maxFavoEvents and !favoriteEvents.contains(event)}">
 					    <input type="hidden" name="eventId" th:value="${event.id}" />
 					    <button>
 							<i class="fa-solid fa-heart-circle-plus"></i>
@@ -37,7 +37,7 @@
 					
 					<form th:action="@{/favorites/favorite}"
 					      method="post"
-					      th:if="${user != null and user.role.displayRole == 'Gebruiker' and user.favoriteEvents.contains(event)}">
+					      th:if="${username != null and role == 'Gebruiker' and favoriteEvents.contains(event)}">
 					    <input type="hidden" name="eventId" th:value="${event.id}" />
 					    <button>
 							<i class="fa-solid fa-heart-circle-minus"></i>
@@ -46,7 +46,7 @@
 					</form>
 					
 					<a th:href="@{/saveevent(id=${event.id})}" class="nolink">
-						<button th:if="${user != null and user.role.displayRole == 'Administrator'}">
+						<button th:if="${username != null and role == 'Administrator'}">
 							<i class="fa-solid fa-pen-to-square"></i>
 							<span th:text="#{eventdetail.edit}"></span>
 						</button>

@@ -14,8 +14,8 @@
 		        <h4 th:text="#{footer.links}"></h4>
 		        <ul>
 		     	   <li><a th:text="#{nav.events}" href="/events"></a></li>
-		           <li><a th:if="${user != null and user.role.displayRole == 'Administrator'}" th:text="#{nav.rooms}" href="#"></a></li>
-		           <li><a th:if="${user != null and user.role.displayRole == 'Gebruiker'}" th:text="#{nav.favs}" href="/favorites"></a></li>
+		           <li><a th:if="${username != null and role == 'Administrator'}" th:text="#{nav.rooms}" href="#"></a></li>
+		           <li><a th:if="${username != null and role != 'Administrator'}" th:text="#{nav.favs}" href="/favorites"></a></li>
 		        </ul>
 		    </div>
 		    <div class="footer-right">

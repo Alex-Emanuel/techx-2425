@@ -12,6 +12,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,17 +44,28 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import validator.BeamerCorrect;
 import validator.DateInRange;
 import validator.UniqueSpeakers;
 import validator.ValidSpeakers;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 
 @Entity
 @Getter
 @Setter
 @UniqueSpeakers
 @ValidSpeakers
+@BeamerCorrect
 @EqualsAndHashCode(of = "name")
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
+@JsonPropertyOrder({
+    "id", "name", "description", "category", "date", "time",
+    "room", "beamerCode", "beamerCheck", "price", "announcement",
+    "speakers", "imageName"
+})
 public class Event implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -74,10 +90,14 @@ public class Event implements Serializable {
 	@NotNull(message = "{validation.date.NotNull.message}")
 	@DateInRange
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@JsonSerialize(using = LocalDateSerializer.class)
+	@JsonDeserialize(using = LocalDateDeserializer.class)
 	private LocalDate date;
 	
 	@NotNull(message = "{validation.time.NotNull.message}")
 	@DateTimeFormat(pattern = "HH:mm")
+	@JsonSerialize(using = LocalTimeSerializer.class)
+	@JsonDeserialize(using = LocalTimeDeserializer.class)
     private LocalTime time;
 	
 	@NotBlank(message = "{validation.beamerCode.NotBlank.message}")
@@ -110,6 +130,7 @@ public class Event implements Serializable {
 	
 	@Lob
     @Basic(fetch = FetchType.LAZY)
+	@JsonIgnore
     private byte[] image;
     
     @Column(name="image_name")

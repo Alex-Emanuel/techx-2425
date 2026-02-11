@@ -24,33 +24,36 @@
 	               th:text="#{nav.events}"
 	               th:classappend="${page == 'events'} ? 'selected'"></a>
 	
-	            <a th:href="@{/rooms}" 
-	               th:if="${user != null and user.role.displayRole == 'Administrator'}"
+	            <a th:href="@{/rooms/list}" 
+	               th:if="${username != null and role == 'Administrator'}"
 	               th:text="#{nav.rooms}"
 	               th:classappend="${page == 'rooms'} ? 'selected'"></a>
 	
 	            <a th:href="@{/favorites}"
-	               th:if="${user != null and user.role.displayRole == 'Gebruiker'}"
+	               th:if="${username != null and role != 'Administrator'}"
 	               th:text="#{nav.favs}"
 	               th:classappend="${page == 'favorites'} ? 'selected'"></a>
 	        </div>
 	    </div>   
 	    
-	    <div class="user-info" id="loginButton" onclick="toggleUserInfo()">
+	    <a class="user-info" id="loginButton" th:if="${username == null or role == null}" th:href="@{/login}">
 	        <button class="login-btn" th:text="#{nav.login}"></button>
-	    </div>
+	    </a>
 	
-	    <div class="user-info" style="display: none;" id="user-info" th:if="${user != null}">
+	    <div class="user-info" id="user-info" th:if="${username != null and role != null}">
 	        <div>
-	            <p class="user-name" th:text="${user.username}"></p>
-	            <p class="user-role" th:text="#{${user.role.displayRole}}"></p>
+	            <p class="user-name" th:text="${username}"></p>
+	            <p class="user-role" th:text="#{${role}}"></p>
 	        </div>
 	        <i class="fa-solid fa-circle-user"></i>
 	        <div class="logout-popup">
-	            <button>
-	                <i class="fa-solid fa-arrow-right-from-bracket" style="font-size: 16px;"></i>
-	                <span th:text="#{nav.logout}"></span>
-	            </button>
+	        	<form th:action="@{/logout}" method="post">
+					<button type="submit">
+		                <i class="fa-solid fa-arrow-right-from-bracket" style="font-size: 16px;"></i>
+		                <span th:text="#{nav.logout}"></span>
+		            </button>
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+				</form>
 	        </div>
 	    </div>
 	</nav>

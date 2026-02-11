@@ -7,14 +7,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import domain.Event;
 import domain.Speaker;
+import exception.DoubleBookingException;
+import exception.DuplicateEventNameException;
 import jakarta.validation.Valid;
 import repository.EventRepository;
 import repository.SpeakerRepository;
 
+@Service
 public class EventServiceImpl implements EventService {
 
 	@Autowired
@@ -36,13 +40,16 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public void makeEvent(Event event) {
+		checkDouble(event, event.getId());
 		List<Speaker> finalSpeakers = chosenSpeakers(event);		
 	    event.setSpeakers(finalSpeakers);
 	    eventRepository.save(event);
 	}
 
 	@Override
-	public void editEvent(Event knownEvent, Event newevent, MultipartFile image) {		
+	public void editEvent(Event knownEvent, Event newevent, MultipartFile image) {
+		checkDouble(newevent, knownEvent.getId());
+		
         knownEvent.setCategory(newevent.getCategory());
         knownEvent.setName(newevent.getName());
         knownEvent.setDescription(newevent.getDescription());
@@ -91,5 +98,21 @@ public class EventServiceImpl implements EventService {
 		}
 		
 		return finalSpeakers;
+	}
+	
+	private void checkDouble(Event event, Long excludeEventId) {
+	    
+	    // Er mag geen dubbel event op hetzelfde tijdstip in hetzelfde lokaal zijn.
+	    Optional<Event> optEvent = eventRepository.findByDateAndTimeAndRoom(
+	            event.getDate(), event.getTime(), event.getRoom());
+	    if(optEvent.isPresent() && optEvent.get().getId() != excludeEventId) {
+	        throw new DoubleBookingException(event.getDate(), event.getTime(), event.getRoom());
+	    }
+	    
+	    // Naam van de event op dezelfde dag mag nog niet voorkomen
+	    optEvent = eventRepository.findByNameAndDate(event.getName(), event.getDate());
+	    if(optEvent.isPresent() && optEvent.get().getId() != excludeEventId) {
+	        throw new DuplicateEventNameException(event.getName(), event.getDate());
+	    }
 	}
 }

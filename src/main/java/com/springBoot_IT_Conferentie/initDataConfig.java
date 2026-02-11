@@ -2,16 +2,20 @@ package com.springBoot_IT_Conferentie;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 import domain.Event;
 import domain.Room;
 import domain.Speaker;
-import domain.User;
+import domain.MyUser;
 import repository.EventRepository;
 import repository.RoomRepository;
 import repository.SpeakerRepository;
@@ -31,17 +35,19 @@ public class initDataConfig implements CommandLineRunner {
 	@Autowired
 	private UserRepository userRepository;
 	
+	private PasswordEncoder encoder = new BCryptPasswordEncoder();
+	
 	@Override
 	public void run(String... args) {
 
 		//ROOMS
 		//=====
-		Room room1 = new Room("A001", 25);
-		Room room2 = new Room("B002", 40);
-		Room room3 = new Room("C003", 30);
-		Room room4 = new Room("D004", 15);
-		Room room5 = new Room("E005", 50);
-		Room room6 = new Room("F006", 1);
+		Room room1 = new Room(0, "A001", 25);
+		Room room2 = new Room(0, "B002", 40);
+		Room room3 = new Room(0, "C003", 30);
+		Room room4 = new Room(0, "D004", 15);
+		Room room5 = new Room(0, "E005", 50);
+		Room room6 = new Room(0, "F006", 1);
 		
 		//SPEAKERS
 		//========
@@ -170,11 +176,21 @@ public class initDataConfig implements CommandLineRunner {
 		
 		//USERS
 		//=====
-		User user1 = new User("admin@example.com", "kaas", ADMIN);
-		User user2 = new User("user@example.com", "kaas", USER);
-		user2.addFavoriteEvent(event1);
-		user2.addFavoriteEvent(event3);
-		user2.addFavoriteEvent(event5);
+		var user = MyUser.builder()
+				.username("user@example.com")
+				.role(USER)
+				.password(encoder.encode("kaas"))
+				.build();
+		user.addFavoriteEvent(event1);
+		user.addFavoriteEvent(event3);
+		user.addFavoriteEvent(event5);
+		
+		var admin = MyUser.builder()
+				.username("admin@example.com")
+				.role(ADMIN)
+				.password(encoder.encode("kaas"))
+				.build();
+		
 		
 		//ADD TO REPO
 		//===========
@@ -188,6 +204,6 @@ public class initDataConfig implements CommandLineRunner {
 				event7, event8, event9, event10, event11, event12, 
 				event13, event14, event15, event16, event17, event18
 		));
-		userRepository.saveAll(List.of(user1, user2));
+		userRepository.saveAll(Arrays.asList(admin, user));
 	}
 }

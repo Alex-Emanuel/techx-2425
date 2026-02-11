@@ -16,12 +16,12 @@
 		<div class="contentDetail addEventForm">
 			<nav class="breadcrumb">
 				<a th:href="@{/events}" th:text="#{nav.events}"></a> &gt;
-				<span th:text="${event_id != 0 && event_id != null} ? #{edit.title} : #{add.title}"></span>
+				<span th:text="${event_id != 0 && event_id != null && event_id != -1} ? #{edit.title} : #{add.title}"></span>
 			</nav>
 			<div class="eyecatcher">
 				<div>
-					<h2 th:text="${event_id != 0 && event_id != null} ? #{edit.title} : #{add.title}" class="addTitle"></h2>
-					<form th:action="@{/saveevent}" th:object="${newevent}" method="post" class="form-layout" enctype="multipart/form-data">
+					<h2 th:text="${event_id != 0 && event_id != null && event_id != -1} ? #{edit.title} : #{add.title}" class="addTitle"></h2>
+					<form th:action="@{/saveevent}" th:object="${newevent}" method="post" enctype="multipart/form-data">
 
 					    <!-- Event Name -->
 					    <div class="form-group">
@@ -70,10 +70,7 @@
 								    <span th:if="${#fields.hasErrors('speakers[' + iStat.index + '].organization')}"
 								          th:errors="*{speakers[__${iStat.index}__].organization}"></span>
 								</span>
-								<!-- 
-								<span th:if="${#fields.hasErrors('speakers[' + iStat.index + '].organization')}" th:errors="*{speakers[__${iStat.index}__].organization}" class="error insideerr"></span>-->
 							</div>
-							
 					    	<span th:each="err : ${#fields.globalErrors()}" th:text="${err}" class="error outsideerr"></span>
 						</fieldset>
 						
@@ -82,7 +79,7 @@
 						    <div class="form-group">
 						        <label for="room"><span th:text="#{form.room}"></span><span class="required">*</span></label>
 						        <select th:field="*{room}" id="room" >
-						            <option th:each="room : ${rooms}" th:value="${room}" th:text="${room}"></option>
+						            <option th:each="room : ${rooms}" th:value="${room.id}" th:text="${room.roomcode}"></option>
 						        </select>
 						        <span th:if="${#fields.hasErrors('room')}" th:errors="*{room}" class="error"></span>
 						    </div>
@@ -139,7 +136,7 @@
 					    <div class="form-group">
 						    <label for="image" th:text="#{form.image}"></label>
 						    <input type="file" id="image" name="image" accept=".jpg, .jpeg"/>
-						    <div th:if="${event_id != 0 and event_id != null and newevent.image != null}" class="uploadedimgdiv">
+						    <div th:if="${event_id != 0 and event_id != null and newevent.image != null and event_id != -1}" class="uploadedimgdiv">
 						    	<img th:src="@{/images/events/{id}(id=${event_id})}" th:alt="|Image of &quot;${newevent.name}&quot;|"
 						    		class="uploadimg" />
 		                        <p class="uploadtxt" th:text="#{form.imgalready}"></p>
@@ -148,9 +145,9 @@
 					
 					    <!-- Submit -->
 					    <div class="form-group">
-					        <button type="submit" class="submit-btn" th:text="${event_id != 0 && event_id != null} ? #{form.edit} : #{form.submit}"></button>
+					    	<input type="hidden" name="event_id" th:value="${event_id}" />
+					        <button type="submit" class="submit-btn" th:text="${event_id != 0 && event_id != null && event_id != -1} ? #{form.edit} : #{form.submit}"></button>
 					    </div>
-					    
 					</form>
 				</div>
 			</div>

@@ -4,5 +4,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import domain.Room;
 
-public interface RoomRepository extends CrudRepository<Room, String>
-{}
+public interface RoomRepository extends CrudRepository<Room, Long>
+{
+	boolean existsByRoomcode(String roomcode);
+}

@@ -41,7 +41,7 @@
 			        </div>
 			    </div>
 			</form>
-			<div th:if="${user != null and user.role.displayRole == 'Gebruiker' and user.favoriteEvents.size() >= maxFavoEvents}" class="max-favs">
+			<div th:if="${username != null and role == 'Gebruiker' and favoriteEvents.size() >= maxFavoEvents}" class="max-favs">
 			    <p><span class="bold" th:text="#{results.attention}"></span><span th:text="#{results.maxEvents}"></span></p>
 			</div>
 			<div th:if="${#lists.isEmpty(eventList)}" class="no-results">
@@ -53,10 +53,10 @@
 			    <div class="event-card" th:each="event : ${eventList}">
 			    	<form th:action="@{/favorites/favorite}"
 					      method="post"
-					      th:if="${user != null and user.role.displayRole == 'Gebruiker' and (user.favoriteEvents.size() < maxFavoEvents or user.favoriteEvents.contains(event))}">
+					      th:if="${username != null and role == 'Gebruiker' and (favoriteEvents.size() < maxFavoEvents or favoriteEvents.contains(event))}">
 					    <input type="hidden" name="eventId" th:value="${event.id}" />
 					    <button type="submit" class="favorite-icon">
-					        <i class="favorite-icon" th:classappend="${user.favoriteEvents.contains(event) ? 'fa-solid fa-heart' : 'fa-regular fa-heart'}"></i>
+					        <i class="favorite-icon" th:classappend="${favoriteEvents.contains(event) ? 'fa-solid fa-heart' : 'fa-regular fa-heart'}"></i>
 					    </button>
 					</form>
 			        <img th:src="@{/images/events/{id}(id=${event.id})}" th:alt="|Image of &quot;${event.name}&quot;|"/>

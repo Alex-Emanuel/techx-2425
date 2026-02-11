@@ -1,6 +1,8 @@
 package service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,11 +10,13 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import domain.Category;
 import domain.Event;
 import repository.EventRepository;
 
+@Service
 public class ConferenceServiceImpl implements ConferenceService {
 
 	@Autowired
@@ -39,24 +43,26 @@ public class ConferenceServiceImpl implements ConferenceService {
 	
 	@Override
 	public List<Event> getFilteredEvents(String category, LocalDate date) {
-	    List<Event> events = (List<Event>) eventRepository.findAll();
+	    List<Event> events = new ArrayList<>();
 
+	    // Filter on both category and date
+	    if (category != null && !category.isEmpty() && date != null)
+	        events = eventRepository.findByCategoryAndDate(Category.valueOf(category.toUpperCase()), date)
+	        		.orElse(Collections.emptyList());
 	    // Filter on category
-	    if (category != null && !category.isEmpty()) {
-	        events = events.stream()
-	                       .filter(event -> event.getCategory().name().equalsIgnoreCase(category))
-	                       .collect(Collectors.toList());
-	    }
-
+	    else if (category != null && !category.isEmpty())
+	        events = eventRepository.findByCategory(Category.valueOf(category.toUpperCase()))
+	        		.orElse(Collections.emptyList());
 	    // Filter on date
-	    if (date != null) {
-	        events = events.stream()
-	                       .filter(event -> event.getDate().equals(date))
-	                       .collect(Collectors.toList());
-	    }
-
-	    events.sort(Comparator.comparing(Event::getDate).thenComparing(Comparator.comparing(Event::getTime)));
+	    else if (date != null)
+	        events = eventRepository.findByDate(date).orElse(Collections.emptyList());
+	    // No filters
+	    else 
+	        events = (List<Event>) eventRepository.findAll();
 	    
+	    // Sort
+	    events.sort(Comparator.comparing(Event::getDate)
+	                          .thenComparing(Event::getTime));
 	    return events;
 	}
 
@@ -73,5 +79,10 @@ public class ConferenceServiceImpl implements ConferenceService {
 		        .collect(Collectors.toList());
 
 		return events;
+	}
+
+	@Override
+	public List<Event> getEventsByDate(LocalDate date) {
+		return eventRepository.findByDate(date).orElse(Collections.emptyList());
 	}
 }
